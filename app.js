@@ -5,7 +5,7 @@ const Node = (params => {
   class NodeClass {
     constructor(value, ...nodeChildren) {
       const privateMembers = {};
-      privateMembers.value = value;
+      privateMembers.value = Math.round(value) || 0;
       privateMembers.parent = null;
       privateMembers.children = nodeChildren.filter(
         x => x instanceof NodeClass
@@ -56,40 +56,23 @@ const getSubtreeStatistics = (() => {
     }
   };
 
-  const calculateStatistics = node => {
+  const calculateStatistics = (node, test) => {
     let sum = 0,
       arithmetic_mean = 0,
       median = 0;
 
-    initialize();
-    subset = sumUpSubtree(node);
-    subset.sort();
-    subset.forEach(x => (sum += x));
-    median = calculateMedian(subset);
-    return { sum, arithmetic_mean: sum / subset.length, median };
+    if (test) return { calculateMedian, subset, initialize, sumUpSubtree };
+    if (node) {
+      initialize();
+      subset = sumUpSubtree(node);
+      subset.sort();
+      subset.forEach(x => (sum += x));
+      median = calculateMedian(subset);
+      return { sum, arithmetic_mean: sum / subset.length, median };
+    } else return { sum, arithmetic_mean, median };
   };
 
   return calculateStatistics;
 })();
 
-const node10 = new Node(5);
-const node9 = new Node(8, node10);
-const node8 = new Node(2);
-const node7 = new Node(0, node8, node9);
-const node6 = new Node(1);
-const node5 = new Node(5);
-const node4 = new Node(2);
-const node3 = new Node(7, node6, node7);
-const node2 = new Node(3, node4, node5);
-const node1 = new Node(5, node2, node3);
-
-console.log(getSubtreeStatistics(node1));
-console.log(getSubtreeStatistics(node2));
-console.log(getSubtreeStatistics(node3));
-console.log(getSubtreeStatistics(node4));
-console.log(getSubtreeStatistics(node5));
-console.log(getSubtreeStatistics(node6));
-console.log(getSubtreeStatistics(node7));
-console.log(getSubtreeStatistics(node8));
-console.log(getSubtreeStatistics(node9));
-console.log(getSubtreeStatistics(node10));
+module.exports = { Node, getSubtreeStatistics };
